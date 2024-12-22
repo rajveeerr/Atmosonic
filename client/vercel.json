@@ -1,5 +1,7 @@
 {
-    "rewrites":  [
-      {"source": "/(.*)", "destination": "/"}
-    ]
-  }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/client/$1" }
+  ],
+  "redirects": [],
+  "cleanUrls": true
+}
