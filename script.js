@@ -54,6 +54,7 @@ async function spotifyPlaylist(genre) {
             retryCount++;
         } else if (response.ok) {
             const data = await response.json();
+            // console.log(data, genre);
             return data;
         } else {
             alert('There was an error. Please try again later.');
@@ -207,8 +208,6 @@ async function getWeatherData(location){
         
     }
     catch(e){
-        console.log(e);
-        
         alert("Enter a valid city name!!!! or Check your Internet Connection");
         document.getElementById("location").value="";
     }
