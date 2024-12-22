@@ -1,10 +1,11 @@
-const weatherApiKey='c63a0cfa8ef40f63b57c78e99bc0e49c';
-
+const env=require("dotenv")
+env.config()
+const weatherApiKey=process.env.weatherApiKey;
 
 
 async function getToken() {
-    const clientId = '2fe063b65bc443b982ddb67808ef5783';
-    const clientSecret = '9b4a3a4ff5154361b3d4ecaff64b8206';
+    const clientId = process.env.clientId;
+    const clientSecret = process.env.clientSecret;
     const encodedCredentials = btoa(`${clientId}:${clientSecret}`);
     
     const response = await fetch('https://accounts.spotify.com/api/token', {//the way to send post req to servers
