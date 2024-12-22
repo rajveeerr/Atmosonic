@@ -433,7 +433,7 @@ footer{
     border: 1px solid rgba(255, 241, 241, 0.11);
     border-radius: 15px;
     text-decoration: none;
-    min-width: 25rem;
+    /* min-width: 25rem; */
 }
 .song-details:hover{
     background: linear-gradient(rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
