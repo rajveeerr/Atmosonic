@@ -1,5 +1,5 @@
 const weatherApiKey="c63a0cfa8ef40f63b57c78e99bc0e49c"
-const backendUrl="http://localhost:3000/"
+const backendUrl="https://atmosonic.vercel.app/"
 
 function weatherToDescription(weather){
     const weatherDescription= {

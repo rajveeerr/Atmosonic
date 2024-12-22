@@ -14,7 +14,7 @@ function errorHandeler(err,req,res,next){
     })
 }
 
-app.use(cors())
+app.use(cors({origin: "https://atmosonic.netlify.app/main"}))
 app.use(errorHandeler)
 
 app.get("/",async (req,res)=>{//"?genre='chill'"
