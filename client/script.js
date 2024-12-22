@@ -1,71 +1,5 @@
-const env=require("dotenv")
-env.config()
-const weatherApiKey=process.env.weatherApiKey;
-
-
-async function getToken() {
-    const clientId = process.env.clientId;
-    const clientSecret = process.env.clientSecret;
-    const encodedCredentials = btoa(`${clientId}:${clientSecret}`);
-    
-    const response = await fetch('https://accounts.spotify.com/api/token', {//the way to send post req to servers
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': `Basic ${encodedCredentials}`
-        },
-        body: new URLSearchParams({
-            'grant_type': 'client_credentials'
-        })
-    });
-
-    if (response.ok) {
-        const data = await response.json();
-        // console.log('Access Token:', data.access_token);
-        return data.access_token;
-    } else {
-        alert('There was an error try again later.');
-    }
-}
-
-
-
-async function spotifyPlaylist(genre) {
-    const accessToken = await getToken();
-    let retryCount = 0;
-    const maxRetries = 5; 
-    const retryDelay = 2000; 
-
-    while (retryCount < maxRetries) {
-        console.log(genre);
-        
-        const response = await fetch(`https://api.spotify.com/v1/search?q=genre:${genre}&type=track&limit=5`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
-        });
-
-        if (response.status === 429) {
-            const retryAfter = response.headers.get('Retry-After');
-            const delay = retryAfter ? retryAfter * 1000 : retryDelay * (retryCount + 1);
-
-            alert(`Rate limit exceeded. Retrying in ${delay / 1000} seconds...`);
-            await new Promise(resolve => setTimeout(resolve, delay));
-            retryCount++;
-        } else if (response.ok) {
-            const data = await response.json();
-            // console.log(data, genre);
-            return data;
-        } else {
-            alert('There was an error. Please try again later.');
-            break;
-        }
-    }
-
-    alert('Failed to fetch playlists after multiple attempts. Please try again later.');
-    return null; 
-}
-         
+const weatherApiKey="c63a0cfa8ef40f63b57c78e99bc0e49c"
+const backendUrl="http://localhost:3000/"
 
 function weatherToDescription(weather){
     const weatherDescription= {
@@ -117,8 +51,6 @@ function weatherTOEmoji(weather){
         return weatherEmojiMap[weather]; 
     }
     return "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Globe%20Showing%20Asia-Australia.png";
-    
-    
 }
 
 //fn to map mood with weather
@@ -141,6 +73,50 @@ function map(weather){
     }
     return 'chill';
 }
+
+async function getWeatherData(location){
+
+    try{
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${weatherApiKey}`);
+        const data = await response.json();
+        let weather=await data.weather[0].main;
+        let temperature=await data.main.temp-273;
+        let genre=await map(weather.toLowerCase());
+        let playlistResponse= await fetch(`${backendUrl}?genre=${genre}`,{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })//to extract play list name artist name and img of 4 playlist- done
+        let tracks=await playlistResponse.json()
+        let playlistData=tracks.tracks
+        console.log(playlistData);
+        
+        //sometimes spotify returns empty object handle that- done
+        let playlistWeatherDetails=[]
+        for(let i=0;i<4;i++){
+            const playlistName = playlistData.tracks.items[i].name || "Unknown Playlist";
+            const playlistArtist = playlistData.tracks.items[i].artists[0].external_urls.name || "Unknown Artist";
+            const playlistImage = playlistData.tracks.items[i].album.images[0].url || "placeholder-image-url.jpg";
+            const url = playlistData.tracks.items[i].uri || "#";
+            // if(playlistName===null||playlistName===undefined||playlistArtist===null||playlistArtist===undefined||url===null||url===undefined||playlistImage===null||playlistImage===undefined){
+            //     alert("Something Went Wrong(From our End!! Please try again Later!!(Sorry)");
+            //     throw console.error();
+            // }
+            let tempplaylistWeatherDetails=[playlistName,playlistArtist,playlistImage,url,weather,temperature,location,genre];
+            playlistWeatherDetails.push(tempplaylistWeatherDetails);
+        }
+        
+        await setDom(playlistWeatherDetails);
+        
+    }
+    catch(e){
+        alert("Enter a valid city name!!!! or Check your Internet Connection");
+        console.log(e);
+        document.getElementById("location").value="";
+    }
+
+};
 
 async function setDom(arr){
     let temp=document.getElementById("temperature");
@@ -176,52 +152,12 @@ async function setDom(arr){
     weatherIcon.setAttribute("src",`${weatherTOEmoji(`${arr[0][4].toLowerCase()}`)}`);
 }
 
-async function getWeatherData(location){
-
-    try{
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${weatherApiKey}`);
-        const data = await response.json();
-        let weather=await data.weather[0].main;
-        let temperature=await data.main.temp-273;
-        let genre=await map(weather.toLowerCase());
-        let playlistData=await spotifyPlaylist(genre); //to extract play list name artist name and img of 4 playlist- done
-        console.log(playlistData);
-        
-        //sometimes spotify returns empty object handle that- done
-        let playlistWeatherDetails=[]
-        for(let i=0;i<4;i++){
-            const playlistName = playlistData.tracks.items[i].name || "Unknown Playlist";
-            const playlistArtist = playlistData.tracks.items[i].artists[0].external_urls.name || "Unknown Artist";
-            const playlistImage = playlistData.tracks.items[i].album.images[0].url || "placeholder-image-url.jpg";
-            const url = playlistData.tracks.items[i].uri || "#";
-            if(playlistName===null||playlistName===undefined||playlistArtist===null||playlistArtist===undefined||url===null||url===undefined||playlistImage===null||playlistImage===undefined){
-                alert("Something Went Wrong(From our End!! Please try again Later!!(Sorry)");
-                throw console.error();
-            }
-            let tempplaylistWeatherDetails=[playlistName,playlistArtist,playlistImage,url,weather,temperature,location,genre];
-            // console.log(playlistName," : ", playlistArtist," : ",url,":",playlistImage);
-            playlistWeatherDetails.push(tempplaylistWeatherDetails);
-
-        }
-        
-        await setDom(playlistWeatherDetails);
-        
-    }
-    catch(e){
-        alert("Enter a valid city name!!!! or Check your Internet Connection");
-        document.getElementById("location").value="";
-    }
-
-};
-
-
 function submit(){
     const city=document.getElementById("location").value;
     if(!city){
         alert("City Name Required!!!")
     }
     else{
-        // console.log(city);
         getWeatherData(city);
     }
 }
