@@ -14,7 +14,7 @@ function errorHandeler(err,req,res,next){
     })
 }
 
-app.use(cors({origin: ["https://atmosonic.vercel.app/main","https://atmosonic.vercel.app/"]}))
+app.use(cors({origin: ["https://atmosonic.netlify.app/main","https://atmosonic.nnetlify.app/"]}))
 app.use(errorHandeler)
 
 app.get("/",async (req,res)=>{//"?genre='chill'"
