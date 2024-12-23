@@ -1,5 +1,5 @@
 const weatherApiKey="c63a0cfa8ef40f63b57c78e99bc0e49c"
-const backendUrl="https://atmosonic-server.vercel.app/"
+const backendUrl="http://localhost:3000/"
 
 function weatherToDescription(weather){
     const weatherDescription= {
@@ -53,27 +53,6 @@ function weatherTOEmoji(weather){
     return "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Globe%20Showing%20Asia-Australia.png";
 }
 
-//fn to map mood with weather
-function map(weather){
-    weathertoGenre={
-    'clear': ['pop', 'indie-pop', 'happy', 'summer', 'synth-pop'],
-    'clouds': ['indie', 'alt-rock', 'folk', 'chill', 'british'],
-    'rain': ['jazz', 'blues', 'acoustic', 'rainy-day', 'soul'],
-    'thunderstorm': ['hard-rock', 'metal', 'industrial', 'dubstep', 'edm'],
-    'snow': ['classical', 'holidays', 'piano', 'opera','piano'],
-    'mist': ['trip-hop', 'lo-fi', 'chill', 'new-age','chill'],
-    'drizzle': ['soft-rock', 'folk', 'singer-songwriter', 'acoustic', 'romance'],
-    'wind': ['psych-rock', 'progressive-house', 'world-music', 'guitar', 'garage'],
-    'extreme': ['industrial', 'hardcore', 'grindcore', 'metalcore', 'death-metal'],
-    'atmosphere': ['psychedelic', 'trip-hop', 'experimental', 'minimal-techno','trip-hop']
-};
-    // console.log(weathertoGenre[`${weather}`][Math.floor(Math.random() * 3)] || ['Ambient']);
-    if(weathertoGenre[`${weather}`]){
-        return weathertoGenre[`${weather}`][Math.floor(Math.random() * 5)] || ['chill'];
-    }
-    return 'chill';
-}
-
 async function getWeatherData(location){
 
     try{
@@ -81,22 +60,26 @@ async function getWeatherData(location){
         const data = await response.json();
         let weather=await data.weather[0].main;
         let temperature=await data.main.temp-273;
-        let genre=await map(weather.toLowerCase());
-        let playlistResponse= await fetch(`${backendUrl}?genre=${genre}`,{
-            method: "GET",
+        let playlistResponse= await fetch(`${backendUrl}`,{
+            method: "POST",
+            body: JSON.stringify({
+                weather: data,
+                city: location,
+            }),
             headers: {
                 "Content-Type": "application/json"
             }
         })//to extract play list name artist name and img of 4 playlist- done
-        let tracks=await playlistResponse.json()
-        let playlistData=tracks.tracks
-        console.log(playlistData);
+        let tracks=await playlistResponse.json();
+        let playlistData=tracks.tracks;
+        let genre=tracks.genre;
+        
         
         //sometimes spotify returns empty object handle that- done
         let playlistWeatherDetails=[]
         for(let i=0;i<4;i++){
             const playlistName = playlistData.tracks.items[i].name || "Unknown Playlist";
-            const playlistArtist = playlistData.tracks.items[i].artists[0].external_urls.name || "Unknown Artist";
+            const playlistArtist = playlistData.tracks.items[i].artists[0].name || "Unknown Artist";
             const playlistImage = playlistData.tracks.items[i].album.images[0].url || "placeholder-image-url.jpg";
             const url = playlistData.tracks.items[i].uri || "#";
             // if(playlistName===null||playlistName===undefined||playlistArtist===null||playlistArtist===undefined||url===null||url===undefined||playlistImage===null||playlistImage===undefined){
@@ -114,6 +97,7 @@ async function getWeatherData(location){
         alert("Enter a valid city name!!!! or Check your Internet Connection");
         console.log(e);
         document.getElementById("location").value="";
+        document.getElementById("scroll").style.display="none";
     }
 
 };
@@ -128,7 +112,7 @@ async function setDom(arr){
     let cityDisplay=document.getElementById("cityDisplay");
     let playlistDisplaySection=document.getElementById("playlistDisplay");
     let scrollAnimation=document.getElementById("scroll")
-
+    
     for(let i=0;i<4;i++){
         let song=document.getElementById(`song${i+1}`);
         let songImg=document.getElementById(`songImg${i+1}`);
@@ -141,7 +125,8 @@ async function setDom(arr){
         artistName.textContent=arr[i][1];
         song.setAttribute("href",`${arr[i][3]}`);
     }
-    scrollAnimation.style.display="flex"
+    document.getElementsByClassName("loading")[0].style.display="none";
+    scrollAnimation.style.display="flex";
     playlistDisplaySection.style.display="flex";
     spotifyButton.setAttribute("href",`${arr[0][3]}`);
     weatherTitle.textContent=`${arr[0][4]} Vibes`
@@ -159,5 +144,9 @@ function submit(){
     }
     else{
         getWeatherData(city);
+        document.getElementById("playlistDisplay").style.display="none";
+        document.getElementById("scroll").style.display="none";
+        document.getElementsByClassName("loading")[0].style.display="flex";
     }
+
 }
