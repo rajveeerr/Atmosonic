@@ -15,7 +15,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 function errorHandeler(err,req,res,next){
     res.status(500).json({
-        message: "Something broke, most likely the spotify apii"
+        message: "Something broke, most likely the spotify api"
     })
 }
 
@@ -23,7 +23,7 @@ app.use(cors())
 app.use(express.json())
 app.use(errorHandeler)
 
-app.post("/",async (req,res)=>{//"?genre='chill'"
+app.post("/",async (req,res)=>{
     let city=req.body.city
     let weather=req.body.weather
     let token=await getToken();
@@ -72,7 +72,6 @@ async function getToken() {
         const data = response.data;
         return data.access_token;
     } else {
-
         console.log('There was an error try again later.');
     }
 }

@@ -98,6 +98,7 @@ async function getWeatherData(location){
         console.log(e);
         document.getElementById("location").value="";
         document.getElementById("scroll").style.display="none";
+        document.getElementsByClassName("loading")[0].style.display="none";
     }
 
 };
