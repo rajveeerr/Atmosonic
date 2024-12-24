@@ -19,7 +19,6 @@ function weatherToDescription(weather){
         "tornado": "A tornado is active in the area. Seek shelter immediately!",
     };
     if(weatherDescription[weather]){
-        // console.log(weatherDescription[weather]," : ",weather);
         return weatherDescription[weather];
     }
     return "Enjoy the day with your favorite tunes!";

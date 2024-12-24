@@ -78,8 +78,11 @@ async function getToken() {
 
 async function spotifyPlaylist(genre,token,market) {
     const accessToken = token;
+    const offset=Math.floor(Math.random() * 3)
+    console.log(offset);
+    
 
-    const response = await axios.get(`https://api.spotify.com/v1/search?q=genre:${genre}&type=track&limit=5&market=${market}`, {
+    const response = await axios.get(`https://api.spotify.com/v1/search?q=genre:${genre}&type=track&limit=5&offset=${offset}&market=${market}`, {
         headers: {
             'Authorization': `Bearer ${accessToken}`
         }
