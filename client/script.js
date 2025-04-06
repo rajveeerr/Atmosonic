@@ -1,5 +1,5 @@
-const weatherApiKey="c63a0cfa8ef40f63b57c78e99bc0e49c"
-const backendUrl="https://atmosonic-server.vercel.app/"
+import { weatherApiKey, backendUrl } from "./config.js";
+
 
 function weatherToDescription(weather){
     const weatherDescription= {
