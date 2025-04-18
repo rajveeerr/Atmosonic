@@ -6,7 +6,7 @@
     <link rel="icon" type="image/x-icon" href="./public/logo-base-1200x1200.png">
     <title>Music for Your Weather</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
     <script src="https://kit.fontawesome.com/b6fe51c8e7.js" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -33,8 +33,8 @@
                 
                     <input type="text" id="location" class="location-inp" placeholder="Enter your City" required>
 
-
-                <button class="submit-btn" type="text" id="submit" href="./main.html" onclick=submit()><span><i class="fa-brands fa-spotify"></i></span>Find My Playlist</a>
+                    <button class="submit-btn" type="button" id="submit">
+                        <span><i class="fa-brands fa-spotify"></i></span>Find My Playlist</a>
                 </button>
             </div>
         </div>

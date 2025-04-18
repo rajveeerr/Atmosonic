@@ -150,3 +150,6 @@ function submit(){
     }
 
 }
+
+const submitBtn = document.getElementById("submit");
+submitBtn.addEventListener('click', submit);
